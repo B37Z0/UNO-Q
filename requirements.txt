@@ -1,0 +1,4 @@
+ai-edge-litert
+numpy
+pillow
+onnxruntime-qnn==2.2.0

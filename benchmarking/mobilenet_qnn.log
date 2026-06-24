@@ -1,0 +1,16 @@
+[0;93m2026-06-22 01:56:54.843575715 [W:onnxruntime:Default, device_discovery.cc:325 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:92 ReadFileContents Failed to open file: "/sys/class/drm/card0/device/vendor"[m
+[0;93m2026-06-22 01:56:54.888385809 [W:onnxruntime:, qnn_execution_provider.cc:671 QnnEp] File mapped weights feature is only available on Windows arm64 devices for QNN API versions >= 2.32. Feature will be disabled by default[m
+[0;93m2026-06-22 01:56:54.911458851 [W:onnxruntime:Default, qnn_backend_manager.cc:321 operator()] Setting ADSP_LIBRARY_PATH = /home/arduino/edgeai/.venv/lib/python3.13/site-packages/onnxruntime_qnn[m
+[1;31m2026-06-22 01:56:55.351773324 [E:onnxruntime:, qnn_execution_provider.cc:1524 GetCapabilityImpl] QNN SetupBackend failed Failed to initialize backend. Error: QNN_BACKEND_ERROR_CANNOT_INITIALIZE: Backend failed to initialize[m
+[1;31m2026-06-22 01:56:55.351909366 [E:onnxruntime:, ep_plugin_provider_interfaces.cc:219 GetCapability] OrtEp::GetCapability() for QNNExecutionProvider failed with error: [ONNXRuntimeError] : 11 : EP_FAIL : QNN SetupBackend failed Failed to initialize backend. Error: QNN_BACKEND_ERROR_CANNOT_INITIALIZE: Backend failed to initialize[m
+[1;31m2026-06-22 01:56:55.367212401 [E:onnxruntime:, inference_session.cc:2506 Initialize] This session contains graph nodes that are assigned to the default CPU EP, but fallback to CPU EP has been explicitly disabled by the user.[m
+Traceback (most recent call last):
+  File "/home/arduino/edgeai/benchmarking/mobilenet_qnn.py", line 21, in <module>
+    session = ort.InferenceSession("/home/arduino/edgeai/benchmarking/mobilenet_v2_float.onnx", sess_options=options)
+  File "/home/arduino/edgeai/.venv/lib/python3.13/site-packages/onnxruntime/capi/onnxruntime_inference_collection.py", line 504, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/arduino/edgeai/.venv/lib/python3.13/site-packages/onnxruntime/capi/onnxruntime_inference_collection.py", line 610, in _create_inference_session
+    sess.initialize_session(providers, provider_options, disabled_optimizers)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+onnxruntime.capi.onnxruntime_pybind11_state.Fail: [ONNXRuntimeError] : 1 : FAIL : This session contains graph nodes that are assigned to the default CPU EP, but fallback to CPU EP has been explicitly disabled by the user.

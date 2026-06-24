@@ -1,0 +1,4 @@
+[0;93m2026-06-22 01:43:38.439861733 [W:onnxruntime:Default, device_discovery.cc:325 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:92 ReadFileContents Failed to open file: "/sys/class/drm/card0/device/vendor"[m
+QNN library path: /home/arduino/edgeai/.venv/lib/python3.13/site-packages/onnxruntime_qnn/libonnxruntime_providers_qnn.so
+CPUExecutionProvider - <onnxruntime.capi.onnxruntime_pybind11_state.OrtEpDevice object at 0xffffa2029d70>
+QNNExecutionProvider - <onnxruntime.capi.onnxruntime_pybind11_state.OrtEpDevice object at 0xffffaf68bcf0>
