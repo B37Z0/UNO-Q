@@ -47,3 +47,11 @@ print(f"Confidence:    {confidence:.1%}")
 print(f"Avg latency:   {sum(times)/len(times):.2f} ms")
 print(f"Min latency:   {min(times):.2f} ms")
 print(f"Max latency:   {max(times):.2f} ms")
+
+"""
+Prediction:    tiger cat
+Confidence:    65.5%
+Avg latency:   68.08 ms
+Min latency:   67.84 ms
+Max latency:   68.39 ms
+"""

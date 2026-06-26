@@ -37,3 +37,20 @@ print(f"Top class index: {top_index}")
 print(f"Avg latency:     {sum(times)/len(times):.2f} ms")
 print(f"Min latency:     {min(times):.2f} ms")
 print(f"Max latency:     {max(times):.2f} ms")
+
+"""
+Run 1: 66.41 ms
+Run 2: 69.29 ms
+Run 3: 70.18 ms
+Run 4: 68.12 ms
+Run 5: 67.96 ms
+Run 6: 68.27 ms
+Run 7: 68.97 ms
+Run 8: 68.77 ms
+Run 9: 69.59 ms
+Run 10: 69.33 ms
+Top class index: 281
+Avg latency:     68.69 ms
+Min latency:     66.41 ms
+Max latency:     70.18 ms
+"""
