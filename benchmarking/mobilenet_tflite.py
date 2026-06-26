@@ -22,6 +22,11 @@ with open("labels.txt") as f:
 
 # Run inference
 times = []
+
+# Warmup run - unecessary, numbers are very stable
+interpreter.set_tensor(input_details[0]['index'], input_data)
+interpreter.invoke()
+
 for _ in range(10):
     start = time.perf_counter()
     # Write image data to model input buffer
