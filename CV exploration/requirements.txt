@@ -1,0 +1,6 @@
+# install torch first via: pip install torch --index-url https://download.pytorch.org/whl/cpu
+# otherwise pip pulls the CUDA-bundled build
+ultralytics
+tensorflow
+opencv-python
+numpy

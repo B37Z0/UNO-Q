@@ -2,6 +2,9 @@ import time
 import numpy as np
 import tensorflow as tf
 
+# Benchmarking multithreaded inference performance of the person detection model.
+# float32 and int8 models are compared, with 1 and 4 threads.
+
 MODELS = {
     "float32": "/home/arduino/edgeai/person_detection_float32.tflite",
     "int8": "/home/arduino/edgeai/person_detection_int8.tflite",
@@ -13,7 +16,7 @@ for label, path in MODELS.items():
         interpreter.allocate_tensors()
 
         input_details = interpreter.get_input_details()
-        shape = input_details[0]['shape']
+        shape = input_details[0]['shape'] # 320px
         dtype = input_details[0]['dtype']
         dummy_input = np.zeros(shape, dtype=dtype)
 
@@ -38,3 +41,4 @@ float32, threads=4, input_shape=[  1 320 320   3]: avg 126.91ms (7.9 FPS)
 int8, threads=1, input_shape=[  1 320 320   3]: avg 190.16ms (5.3 FPS)
 int8, threads=4, input_shape=[  1 320 320   3]: avg 60.35ms (16.6 FPS)
 '''
+# Real-time performance is barely feasible with the int8 model.
