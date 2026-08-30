@@ -99,5 +99,8 @@ class StreamHandler(BaseHTTPRequestHandler):
 
 threading.Thread(target=inference_loop, daemon=True).start()
 
-print(f"Streaming at http://192.168.2.101:{PORT}")
+# Current IPs:
+# - 192.168.2.101
+# - 10.88.111.30
+print(f"Streaming at http://10.88.111.30{PORT}")
 HTTPServer(('0.0.0.0', PORT), StreamHandler).serve_forever()
