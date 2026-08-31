@@ -2,7 +2,7 @@
 Person-tracking pan/tilt loop.
 
 python3 tracking.py
-    --debug           # annotated MJPEG on :8080
+    --debug           # also serve annotated MJPEG on /debug
     --no-servo        # detection + tracking, no motion
 
 Upon Ctrl-C, recenters camera and exits cleanly.
@@ -14,23 +14,28 @@ Pipeline
     main loop (wall-clock paced at DETECT_HZ)
         detect ──> track ──> servo target ──> RPC ──> MCU slew
                             │
-    DebugStream thread (optional) ──> annotated MJPEG on :8080
+    FrameServer thread ──>  /       clean MJPEG  (PC gesture model)
+                            /debug  annotated    (--debug only)
+
+Production output is clean frames - the annotations are only for 
+debugging. Neither enpoint encodes anything unless a client is 
+connected - zero JPEG work is done while unwatched.
 
 Threads
 -------
     1. Camera._loop       - daemon, continuously reads/drains frames
                             so main loop stays up to date
-    2. DebugStream server - daemon, serves MJPEG to browser clients
+    2. FrameServer        - daemon, one thread per connected client
     3. main thread        - runs the detect -> track -> servo loop
 
 All cross-thread data is guarded by threading.Lock. Daemon threads
 die automatically when the main thread exits.
 """
 
-import argparse
-import threading
 import time
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import threading
+import argparse
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import cv2
 import numpy as np
@@ -49,7 +54,7 @@ CAPTURE_W = 640
 CAPTURE_H = 360
 
 # Wall time cadence - tune for performance / tracking speed
-DETECT_HZ = 25.0
+DETECT_HZ = 12.0
 
 # Minimum degree delta for new servo command
 SERVO_MIN_DELTA_DEG = 1.0
@@ -75,8 +80,8 @@ class Camera:
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-        ok, frame = self.cap.read()
-        if not ok:
+        ret, frame = self.cap.read()
+        if not ret:
             raise RuntimeError("Camera open but no frame returned")
 
         self.h, self.w = frame.shape[:2]
@@ -95,8 +100,8 @@ class Camera:
         """Runs in the background thread. Continuously reads and
         overwrites _frame with the newest frame."""
         while self._running:
-            ok, frame = self.cap.read()
-            if not ok:
+            ret, frame = self.cap.read()
+            if not ret:
                 time.sleep(0.01)
                 continue
             with self._lock:
@@ -163,25 +168,38 @@ class Detector:
         return boxes, scores, ms
 
 
-# ----- Debug stream -----
+# ----- Streaming -----
 
-class DebugStream:
-    """Annotated MJPEG over HTTP for debugging"""
+class FrameServer:
+    """
+    Serves MJPEG over HTTP on two endpoints:
+        /        clean frames - for the PC gesture model
+        /debug   annotated frames - for testing
+
+    JPEG encoding skipped when nobody is connected to an endpoint.
+    Debug path also costs nothing in normal operation.
+    """
+
     def __init__(self, port=DEBUG_PORT):
-        self.port = port
-        self.latest = None
+        self.frames = {"clean": None, "debug": None}
+        self.viewers = {"clean": 0, "debug": 0}
         self.lock = threading.Lock()
 
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, fmt, *args):
-                pass  # suppress per-request log spam
+                pass # suppress per-request log spam
 
             def do_GET(self):
                 # MJPEG-over-HTTP: browser opens one long-lived GET, and 
                 # successive JPEG frames are pushed with a multipart boundary.
                 # Browser renders each frame as it arrives -> live video feed.
+                kind = "debug" if self.path.startswith("/debug") else "clean"
+
+                with outer.lock:
+                    outer.viewers[kind] += 1
+
                 self.send_response(200)
                 self.send_header(
                     'Content-Type',
@@ -191,7 +209,7 @@ class DebugStream:
                 try:
                     while True:
                         with outer.lock:
-                            jpeg = outer.latest
+                            jpeg = outer.frames[kind]
                         if jpeg is None:
                             time.sleep(0.01) # no frame, back off
                             continue
@@ -203,18 +221,25 @@ class DebugStream:
                         time.sleep(0.03) # ~30 fps cap to browser
                 except (BrokenPipeError, ConnectionResetError):
                     pass # client disconnected, let handler exit
+                finally:
+                    with outer.lock:
+                        outer.viewers[kind] -= 1
 
-        self.server = HTTPServer(('0.0.0.0', port), Handler)
+        self.server = ThreadingHTTPServer(('0.0.0.0', port), Handler)
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
 
-    def publish(self, frame):
+    def wanted(self, kind):
+        """True if anyone is connected to this endpoint."""
+        with self.lock:
+            return self.viewers[kind] > 0
+
+    def publish(self, kind, frame):
         """Called from main thread each loop iteration. Encodes annotated frame
         to JPEG and stashes it for HTTP handler(s) to pick up"""
-        ok, jpeg = cv2.imencode('.jpg', frame)
-        if ok:
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        if ret:
             with self.lock:
-                self.latest = jpeg.tobytes()
-
+                self.frames[kind] = jpeg.tobytes()
 
 def annotate(frame, boxes, scores, tracker, pan, tilt, det_ms, loop_ms):
     """Draw detections, tracked target, and telemetry onto frame (copy)"""
@@ -294,11 +319,11 @@ def main():
     else:
         print("Servos DISABLED (--no-servo)")
 
-    # HTTP server thread for debug if requested
-    stream = None
+    # HTTP server thread, clean by default
+    server = FrameServer(args.port)
+    print(f"Stream: http://<board-ip>:{args.port}/")
     if args.debug:
-        stream = DebugStream(args.port)
-        print(f"Debug stream on http://<board-ip>:{args.port}")
+        print(f"Debug: http://<board-ip>:{args.port}/debug")
 
     # Target wall time per iteration
     interval = 1.0 / args.hz
@@ -332,11 +357,12 @@ def main():
 
             loop_ms = (time.perf_counter() - loop_start) * 1000
 
-            if stream is not None:
-                stream.publish(
-                    annotate(frame, boxes, scores, tracker,
-                             pan, tilt, det_ms, loop_ms)
-                )
+            if server.wanted("clean"):
+                server.publish("clean", frame)
+            if args.debug and server.wanted("debug"):
+                server.publish("debug",
+                               annotate(frame.copy(), boxes, scores, tracker,
+                                        pan, tilt, det_ms, loop_ms))
 
             # ----- Stats -----
             n += 1

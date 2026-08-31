@@ -47,7 +47,7 @@ class Tracker:
         self,
         fov_h_deg=FOV_H_DEG,
         fov_v_deg=FOV_V_DEG,
-        kp=0.4,
+        kp=0.35,
         deadband_frac=0.04,
         pan_limits=(PAN_MIN, PAN_MAX),
         tilt_limits=(TILT_MIN, TILT_MAX),

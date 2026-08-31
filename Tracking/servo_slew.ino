@@ -1,4 +1,14 @@
+// #include <Servo.h>
+
+// Servo pan;
+// Servo tilt;
+
 // void setup() {
+//   pan.attach(9);
+//   tilt.attach(10);
+
+//   pan.write(94);
+//   tilt.write(94);
 // }
 
 // void loop() {
@@ -30,8 +40,8 @@ const int TILT_MAX    = 124;
 // 1000ms / 20ms = 50 Hz servo update period
 const unsigned long UPDATE_INTERVAL_MS = 20;
 
-// 1.5 deg/tick @ 50 Hz = 75 deg/s
-const float MAX_STEP_DEG = 1.5f;
+// 4 deg/tick @ 50 Hz = 200 deg/s
+const float MAX_STEP_DEG = 4.0f;
 
 // ----- State -----
 
