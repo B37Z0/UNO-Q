@@ -58,6 +58,7 @@ real time.
 ![assembly](assembly.jpg)
 My final assembly - minus the base. I'm rather proud of the wiring.
 
+
 ![tracking_gesture_demo](tracking+gesture-controls.gif)
 
 ---
