@@ -1,0 +1,7 @@
+tensorflow
+opencv-python
+numpy
+msgpack
+
+# tflite-runtime is a smaller alternative for edge devices, but I ran into 
+# compatibility issues early on and decided against further investment

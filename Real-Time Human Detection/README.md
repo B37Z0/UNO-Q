@@ -1,4 +1,4 @@
-## Real-Time Human Detection — Arduino UNO Q
+## Real-Time Human Detection - Arduino UNO Q
 
 Run on a **Qualcomm Dragonwing QRB2210** CPU, using a MobileNetV2 SSD FPN-Lite 320×320 model quantized to INT8. Two scripts: console output and a browser-accessible live video stream with annotated bounding boxes.
 
