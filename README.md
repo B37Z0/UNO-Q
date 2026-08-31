@@ -43,7 +43,7 @@ real time.
 │         ↓                        │
 └─────────┼────────────────────────┘
           │
-         Wi-Fi
+        Wi-Fi
           │
           ▼
          PC
@@ -58,6 +58,7 @@ real time.
 ![assembly](assembly.jpg)
 My final assembly - minus the base. I'm rather proud of the wiring.
 
+![tracking_gesture_demo](tracking+gesture-controls.gif)
 
 ---
 
@@ -348,7 +349,6 @@ Failures are non-fatal by design. A closed browser tab leaves a stale
 D-Bus name behind, and that should print a line rather than kill a
 running gesture session.
 
-![gesture_demo](media_control.gif)
 
 ---
 
@@ -375,6 +375,10 @@ The RPC measurement was quite a surprise: with a 5.27 ms round trip, Linux
 *could* drive the servos directly at 30+ Hz. Smoothing was still placed on
 the MCU, for the timing-stability and crash-safety reasons described
 above rather than for throughput.
+
+![gesture_demo](gesture-controls.gif)
+
+The end-to-end process runs extremely smoothly!
 
 ---
 
