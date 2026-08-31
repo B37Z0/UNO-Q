@@ -58,6 +58,7 @@ real time.
 ![assembly](assembly.jpg)
 My final assembly - minus the base. I'm rather proud of the wiring.
 
+
 ![tracking_gesture_demo](tracking+gesture-controls.gif)
 
 ---
@@ -255,7 +256,7 @@ application does not warrant.
 The STM32 sketch stores a *target* angle and walks the commanded output
 toward it at a fixed 50 Hz:
 
-$$\text{achievable motion per update} = \text{MAX\_STEP\_DEG} \times \frac{\text{update period}}{20\ \text{ms}}$$
+$$\text{achievable motion per update} = \text{MAX-STEP-DEG} \times \frac{\text{update period}}{20\ \text{ms}}$$
 
 `UPDATE_INTERVAL_MS = 20` is fixed by the hardware — standard hobby servos
 sample their input once per 20 ms PWM frame, so commanding faster gains
@@ -485,9 +486,9 @@ Change one knob at a time.
 | Gestures never fire | pose held too briefly, or classifier below threshold | raise `--hold`, lower `--min-score` |
 | Gestures fire repeatedly | reset condition not being met | check that a non-command pose is reached between gestures |
 
-According to Claude, the relationship that matters most:
+The relationship that matters most according to Claude (and I tend to agree):
 
-$$\text{achievable motion per update} = \text{MAX\_STEP\_DEG} \times \frac{\text{update period}}{20\ \text{ms}}$$
+$$\text{achievable motion per update} = \text{MAX-STEP-DEG} \times \frac{\text{update period}}{20\ \text{ms}}$$
 
 This must comfortably exceed the largest correction $K_p$ will command.
 When it does not, the controller accumulates commands the hardware never
