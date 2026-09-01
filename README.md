@@ -55,11 +55,11 @@ real time.
    music controller
 ```
 
-![assembly](assembly.jpg)
+![assembly](Tracking/media/assembly.jpg)
 My final assembly - minus the base. I'm rather proud of the wiring.
 
 
-![tracking_gesture_demo](tracking+gesture-controls.gif)
+![tracking_gesture_demo](Tracking/media/tracking+gesture-controls.gif)
 
 ---
 
@@ -387,7 +387,7 @@ The RPC measurement was quite a surprise: with a 5.27 ms round trip, Linux
 the MCU, for the timing-stability and crash-safety reasons described
 above rather than for throughput.
 
-![gesture_demo](gesture-controls.gif)
+![gesture_demo](Tracking/media/gesture-controls.gif)
 
 Note the demo above is pre-last-write-wins policy. Plenty smooth, but with
 occasional freezes and jumps due to the frame queueing and catch-up
