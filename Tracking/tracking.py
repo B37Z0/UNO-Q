@@ -49,7 +49,7 @@ from tracker import Tracker
 MODEL_PATH = "/home/arduino/edgeai/person_detection/person_detection_int8.tflite"
 THRESHOLD = 0.5
 
-CAMERA_PATH = "/dev/video2"
+CAMERA_PATH = "/dev/video2" # may be /dev/video0 - check with "v4l2-ctl --list-devices"
 CAPTURE_W = 640
 CAPTURE_H = 360
 
@@ -196,23 +196,26 @@ class FrameServer:
                 # successive JPEG frames are pushed with a multipart boundary.
                 # Browser renders each frame as it arrives -> live video feed.
                 kind = "debug" if self.path.startswith("/debug") else "clean"
-
                 with outer.lock:
                     outer.viewers[kind] += 1
 
                 self.send_response(200)
-                self.send_header(
-                    'Content-Type',
-                    'multipart/x-mixed-replace; boundary=frame'
-                )
+                self.send_header('Content-Type',
+                                 'multipart/x-mixed-replace; boundary=frame')
                 self.end_headers()
+
+                last_sent = None
                 try:
                     while True:
                         with outer.lock:
                             jpeg = outer.frames[kind]
-                        if jpeg is None:
-                            time.sleep(0.01) # no frame, back off
+                        # Only send when there is a NEW frame. If the client is slow
+                        # the producer has overwritten frames which are simply skipped.
+                        if jpeg is None or jpeg is last_sent:
+                            time.sleep(0.005) # no frame, back off
                             continue
+                        last_sent = jpeg
+
                         # Write one MJPEG frame boundary + payload
                         self.wfile.write(b'--frame\r\n')
                         self.wfile.write(b'Content-Type: image/jpeg\r\n\r\n')
