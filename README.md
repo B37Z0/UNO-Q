@@ -299,6 +299,16 @@ the debug path costs nothing in normal operation. Clean frames are the
 default because bounding boxes are useful for human debugging but are
 noise to the gesture model.
 
+A glaring problem in early iterations was MJPEG **frame queuing** over
+HTTP when the client stalled. A temporarily loaded PC would then repeatedly
+have to catch up on a backlog of frames, causing agonizingly long delays
+and erratic behavior. To fix this, the server uses a **last-write-wins**
+frame slot rather than a queue. The main loop overwrites the latest JPEG each
+iteration and the HTTP handler thread simply skips anything it missed, picking
+only the most current frame. A slow client sees fewer frames, but never
+falls behind - a clearly acceptable tradeoff for keeping the system responsive.
+
+
 ### Gesture recognition
 
 Runs on the PC using MediaPipe's Gesture Recognizer task with its
@@ -537,6 +547,12 @@ different capture mode than requested if the driver declines. Device node
 numbering does not mean what it appears to mean. Each of these was found
 by measuring (and wasting hours) rather than assuming...
 
+**Frame rate is not the same as freshness.** After implementing the 
+last-write-wins frame-skipping strategy, the PC stream's apparent frame rate
+dropped from 30–40 FPS to 20 FPS while becoming visibly more responsive.
+The higher number was quite misleading; it had been counting a backlog of stale
+frames instead of *live* ones.
+
 ---
 
 ## Possible extensions
@@ -544,12 +560,6 @@ by measuring (and wasting hours) rather than assuming...
 - **Idle behaviour.** The camera currently holds its last position
   indefinitely when nobody is present. Returning to center after a
   timeout would be an easy addition.
-- **Frame dropping on the stream.** MJPEG over HTTP queues frames when
-  the client stalls rather than dropping them, so a temporarily loaded PC
-  causes the stream to back up and then play catch-up — infrequently enough 
-  that it doesn't matter, but it's still not ideal. A send timeout on
-  the server, skipping frames rather than blocking, would degrade more
-  gracefully.
 - **Hardware video encoding.** The QRB2210's Venus encoder is exposed at
   `/dev/video0` and sits unused. Claude tells me I could make use of that...
 - **MJPEG passthrough.** The webcam already outputs JPEG; the current
