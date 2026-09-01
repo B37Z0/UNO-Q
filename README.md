@@ -389,7 +389,9 @@ above rather than for throughput.
 
 ![gesture_demo](gesture-controls.gif)
 
-The end-to-end process runs extremely smoothly!
+Note the demo above is pre-last-write-wins policy. Plenty smooth, but with
+occasional freezes and jumps due to the frame queueing and catch-up
+(see **Streaming** above).
 
 ---
 
@@ -549,7 +551,7 @@ by measuring (and wasting hours) rather than assuming...
 
 **Frame rate is not the same as freshness.** After implementing the 
 last-write-wins frame-skipping strategy, the PC stream's apparent frame rate
-dropped from 30–40 FPS to 20 FPS while becoming visibly more responsive.
+dropped from 30–60 FPS to 20 FPS while becoming visibly more responsive.
 The higher number was quite misleading; it had been counting a backlog of stale
 frames instead of *live* ones.
 
