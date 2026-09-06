@@ -59,7 +59,7 @@ real time.
 My final assembly. I'm rather proud of the wiring.
 
 
-![tracking_gesture_demo](Tracking/media/tracking+gesture-controls.gif)
+![demo](Tracking/media/gesture-control.gif)
 
 ---
 
@@ -165,6 +165,8 @@ TensorFlow, OpenCV, an HTTP server and the control loop across
 four cores. Uneven timing would produce visibly uneven motion (it still does). 
 But if the Linux process crashes mid-slew, the MCU holds its last position and 
 keeps its safety clamps.
+
+![debug-stream](Tracking/media/debug-stream.gif)
 
 ---
 
@@ -386,12 +388,6 @@ The RPC measurement was quite a surprise: with a 5.27 ms round trip, Linux
 *could* drive the servos directly at 30+ Hz. Smoothing was still placed on
 the MCU, for the timing-stability and crash-safety reasons described
 above rather than for throughput.
-
-![gesture_demo](Tracking/media/gesture-controls.gif)
-
-Note the demo above is pre-last-write-wins policy. Plenty smooth, but with
-occasional freezes and jumps due to the frame queueing and catch-up
-(see **Streaming** above).
 
 ---
 
