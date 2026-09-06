@@ -9,6 +9,8 @@ QRB2210 (Debian Linux) handles the camera, neural network and tracking
 logic, while the STM32U585 microcontroller generates servo PWM in hard
 real time.
 
+A short video can be found [here](https://www.youtube.com/watch?v=Ssz2FqKMsp8).
+
 ![demo](Tracking/media/gesture-control.gif)
 
 ```
