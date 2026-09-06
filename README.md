@@ -56,7 +56,7 @@ real time.
 ```
 
 ![front-view](Tracking/media/front-view.jpg)
-My final assembly - minus the base. I'm rather proud of the wiring.
+My final assembly. I'm rather proud of the wiring.
 
 
 ![tracking_gesture_demo](Tracking/media/tracking+gesture-controls.gif)
