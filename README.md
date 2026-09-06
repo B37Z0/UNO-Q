@@ -55,7 +55,7 @@ real time.
    music controller
 ```
 
-![front-view](Tracking/media/front-view.jpg)
+![front-view](Tracking/media/front-view.png)
 My final assembly. I'm rather proud of the wiring.
 
 
