@@ -65,6 +65,17 @@ The INT8 model with four threads runs at ~16 FPS for raw inference. In the
 final system (capture → detect → track → servo → encode), the full loop
 runs at 12–13 Hz — comfortably real-time.
 
+Personal note: Threading on CPUs does not scale linearly during AI inference
+primarily because the workload is memory-bound rather than compute bound. All 
+cores share the same physical memory bus (RAM bandwidth); inference requires 
+constant streaming of weights from RAM into the processor cache, saturating the 
+memory bandwidth limit - once the bus is completely busy, threads idle waiting
+for data.
+
+NN operations also contain sequential steps/dependencies, and there is additional
+management overhead for all the mathematical operations in the layers that may
+outweigh calculation time.
+
 ---
 
 ## Dependencies
